@@ -1,0 +1,223 @@
+### REST API Testing
+@baseUrl = http://localhost:3000
+@workspaceId = 1
+@projectId = 1
+@taskId = 1
+@memberUserId = 2
+@ownershipTargetUserId = 2
+
+### Health Check
+GET {{baseUrl}}/health
+
+### Register
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Ada Lovelace",
+  "email": "ada@example.com",
+  "password": "password123"
+}
+
+### Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "ada@example.com",
+  "password": "password123"
+}
+
+### Current User
+GET {{baseUrl}}/auth/me
+
+### Sessions
+GET {{baseUrl}}/auth/sessions
+
+### Refresh
+POST {{baseUrl}}/auth/refresh
+
+### Logout
+POST {{baseUrl}}/auth/logout
+
+### Logout All
+POST {{baseUrl}}/auth/logout-all
+
+### Create Workspace
+POST {{baseUrl}}/workspaces
+Content-Type: application/json
+
+{
+  "name": "Engineering",
+  "slug": "engineering"
+}
+
+### My Active Workspaces
+GET {{baseUrl}}/workspaces?page=1&limit=10&search=engineer&sortBy=createdAt&sortOrder=desc&status=ACTIVE
+
+### My Inactive Workspaces (Owner Only)
+GET {{baseUrl}}/workspaces?page=1&limit=10&status=INACTIVE
+
+### Workspace Detail
+GET {{baseUrl}}/workspaces/{{workspaceId}}
+
+### Update Workspace (Owner Only)
+PATCH {{baseUrl}}/workspaces/{{workspaceId}}
+Content-Type: application/json
+
+{
+  "name": "Platform Engineering",
+  "slug": "platform-engineering"
+}
+
+### Active Workspace Members
+GET {{baseUrl}}/workspaces/{{workspaceId}}/members?page=1&limit=10&search=ada&sortBy=name&sortOrder=asc&status=ACTIVE
+
+### Inactive Workspace Members (Owner Only)
+GET {{baseUrl}}/workspaces/{{workspaceId}}/members?page=1&limit=10&status=INACTIVE
+
+### Add Workspace Member (Owner or Manager)
+POST {{baseUrl}}/workspaces/{{workspaceId}}/members
+Content-Type: application/json
+
+{
+  "email": "ada@example.com",
+  "role": "MEMBER"
+}
+
+### Change Member Role (Owner or Manager)
+PATCH {{baseUrl}}/workspaces/{{workspaceId}}/members/{{memberUserId}}
+Content-Type: application/json
+
+{
+  "role": "MANAGER"
+}
+
+### Update Workspace Status (Owner Only)
+PATCH {{baseUrl}}/workspaces/{{workspaceId}}/status
+Content-Type: application/json
+
+{
+  "status": "INACTIVE"
+}
+
+### Update Member Status (Owner Only)
+PATCH {{baseUrl}}/workspaces/{{workspaceId}}/members/{{memberUserId}}/status
+Content-Type: application/json
+
+{
+  "status": "INACTIVE"
+}
+
+### Transfer Workspace Ownership (Owner Only)
+POST {{baseUrl}}/workspaces/{{workspaceId}}/ownership-transfer
+Content-Type: application/json
+
+{
+  "userId": {{ownershipTargetUserId}}
+}
+
+### Leave Workspace (Manager or Member Only)
+DELETE {{baseUrl}}/workspaces/{{workspaceId}}/members/me
+
+### Create Project (Owner or Manager Only)
+POST {{baseUrl}}/workspaces/{{workspaceId}}/projects
+Content-Type: application/json
+
+{
+  "name": "Learning Platform",
+  "description": "Build the learning platform API."
+}
+
+### Active Projects
+GET {{baseUrl}}/workspaces/{{workspaceId}}/projects?page=1&limit=10&search=learning&status=ACTIVE
+
+### Inactive Projects (Owner Only)
+GET {{baseUrl}}/workspaces/{{workspaceId}}/projects?page=1&limit=10&status=INACTIVE
+
+### Project Detail
+GET {{baseUrl}}/workspaces/{{workspaceId}}/projects/{{projectId}}
+
+### Update Project (Owner or Manager, Active Project Only)
+PATCH {{baseUrl}}/workspaces/{{workspaceId}}/projects/{{projectId}}
+Content-Type: application/json
+
+{
+  "name": "Learning Platform API",
+  "description": "Build and maintain the learning platform API."
+}
+
+### Clear Project Description (Owner or Manager, Active Project Only)
+PATCH {{baseUrl}}/workspaces/{{workspaceId}}/projects/{{projectId}}
+Content-Type: application/json
+
+{
+  "description": null
+}
+
+### Soft Delete Project (Owner Only)
+PATCH {{baseUrl}}/workspaces/{{workspaceId}}/projects/{{projectId}}/status
+Content-Type: application/json
+
+{
+  "status": "INACTIVE"
+}
+
+### Reactivate Project (Owner Only)
+PATCH {{baseUrl}}/workspaces/{{workspaceId}}/projects/{{projectId}}/status
+Content-Type: application/json
+
+{
+  "status": "ACTIVE"
+}
+
+### Create Task (Any Active Workspace Member, Active Project Only)
+POST {{baseUrl}}/workspaces/{{workspaceId}}/projects/{{projectId}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Build task module",
+  "description": "Add the protected task API.",
+  "dueDate": "2026-10-01",
+  "priority": "HIGH",
+  "assignedToUserId": {{memberUserId}}
+}
+
+### Active Project Tasks
+GET {{baseUrl}}/workspaces/{{workspaceId}}/projects/{{projectId}}/tasks?page=1&limit=10&search=task&status=TODO&priority=HIGH&assignedToUserId={{memberUserId}}
+
+### Task Detail
+GET {{baseUrl}}/workspaces/{{workspaceId}}/projects/{{projectId}}/tasks/{{taskId}}
+
+### Update Task (Any Active Workspace Member, Active Project Only)
+PATCH {{baseUrl}}/workspaces/{{workspaceId}}/projects/{{projectId}}/tasks/{{taskId}}
+Content-Type: application/json
+
+{
+  "title": "Build task module API",
+  "description": "Add and verify the protected task API.",
+  "dueDate": "2026-10-15",
+  "priority": "MEDIUM",
+  "status": "IN_PROGRESS"
+}
+
+### Clear Task Description, Due Date, and Assignee
+PATCH {{baseUrl}}/workspaces/{{workspaceId}}/projects/{{projectId}}/tasks/{{taskId}}
+Content-Type: application/json
+
+{
+  "description": null,
+  "dueDate": null,
+  "assignedToUserId": null
+}
+
+### Complete Task
+PATCH {{baseUrl}}/workspaces/{{workspaceId}}/projects/{{projectId}}/tasks/{{taskId}}
+Content-Type: application/json
+
+{
+  "status": "COMPLETED"
+}
+
+### Hard Delete Task (Any Active Workspace Member, Active Project Only)
+DELETE {{baseUrl}}/workspaces/{{workspaceId}}/projects/{{projectId}}/tasks/{{taskId}}
